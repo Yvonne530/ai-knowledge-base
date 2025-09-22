@@ -1,173 +1,30 @@
-// frontend/tsconfig.json
 {
-    "compilerOptions": {
-      "lib": ["dom", "dom.iterable", "es6"],
-      "allowJs": true,
-      "skipLibCheck": true,
-      "strict": true,
-      "noEmit": true,
-      "esModuleInterop": true,
-      "module": "esnext",
-      "moduleResolution": "bundler",
-      "resolveJsonModule": true,
-      "isolatedModules": true,
-      "jsx": "preserve",
-      "incremental": true,
-      "plugins": [
-        {
-          "name": "next"
-        }
-      ],
-      "baseUrl": ".",
-      "paths": {
-        "@/*": ["./*"],
-        "@/components/*": ["./components/*"],
-        "@/lib/*": ["./lib/*"],
-        "@/types/*": ["./types/*"]
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "es6"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
       }
-    },
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-    "exclude": ["node_modules"]
-  }
-  
-  ---
-  
-  // frontend/.eslintrc.json
-  {
-    "extends": [
-      "next/core-web-vitals",
-      "@typescript-eslint/recommended"
     ],
-    "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint"],
-    "rules": {
-      "@typescript-eslint/no-unused-vars": "error",
-      "@typescript-eslint/no-explicit-any": "warn",
-      "prefer-const": "error",
-      "no-var": "error"
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@/components/*": ["./components/*"],
+      "@/lib/*": ["./lib/*"],
+      "@/types/*": ["./types/*"]
     }
-  }
-  
-  ---
-  
-  // backend/tsconfig.json
-  {
-    "compilerOptions": {
-      "module": "commonjs",
-      "declaration": true,
-      "removeComments": true,
-      "emitDecoratorMetadata": true,
-      "experimentalDecorators": true,
-      "allowSyntheticDefaultImports": true,
-      "target": "ES2021",
-      "sourceMap": true,
-      "outDir": "./dist",
-      "baseUrl": "./",
-      "incremental": true,
-      "skipLibCheck": true,
-      "strictNullChecks": false,
-      "noImplicitAny": false,
-      "strictBindCallApply": false,
-      "forceConsistentCasingInFileNames": false,
-      "noFallthroughCasesInSwitch": false,
-      "paths": {
-        "@/*": ["src/*"],
-        "@/prisma/*": ["prisma/*"]
-      }
-    },
-    "include": [
-      "src/**/*",
-      "prisma/**/*"
-    ],
-    "exclude": [
-      "node_modules",
-      "dist"
-    ]
-  }
-  
-  ---
-  
-  // backend/jest.config.js
-  module.exports = {
-    preset: 'ts-jest',
-    testEnvironment: 'node',
-    moduleFileExtensions: ['js', 'json', 'ts'],
-    rootDir: 'src',
-    testRegex: '.*\\.spec\\.ts$',
-    transform: {
-      '^.+\\.(t|j)s$': 'ts-jest',
-    },
-    collectCoverageFrom: [
-      '**/*.(t|j)s',
-    ],
-    coverageDirectory: '../coverage',
-    coverageReporters: ['text', 'lcov', 'html'],
-    moduleNameMapping: {
-      '^@/(.*)$': '<rootDir>/$1',
-    },
-    setupFilesAfterEnv: ['<rootDir>/../test/setup.ts'],
-  };
-  
-  ---
-  
-  // .gitignore
-  # Dependencies
-  node_modules/
-  */node_modules/
-  
-  # Environment variables
-  .env
-  .env.local
-  .env.production
-  .env.test
-  
-  # Build outputs
-  dist/
-  build/
-  .next/
-  out/
-  
-  # Database
-  *.db
-  *.sqlite
-  uploads/
-  
-  # Logs
-  *.log
-  logs/
-  
-  # Runtime data
-  pids/
-  *.pid
-  *.seed
-  
-  # Coverage directory used by tools like istanbul
-  coverage/
-  *.lcov
-  
-  # Docker
-  .docker/
-  
-  # IDE
-  .vscode/
-  .idea/
-  *.swp
-  *.swo
-  
-  # OS generated files
-  .DS_Store
-  .DS_Store?
-  ._*
-  .Spotlight-V100
-  .Trashes
-  ehthumbs.db
-  Thumbs.db
-  
-  # Prisma
-  prisma/migrations/*
-  
-  # Vercel
-  .vercel
-  
-  # Railway
-  .railway/
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
