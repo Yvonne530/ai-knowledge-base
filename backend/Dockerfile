@@ -5,7 +5,7 @@ WORKDIR /app
 
 # 复制 package.json 和 package-lock.json
 COPY package*.json ./
-COPY prisma ./prisma/
+COPY src/prisma ./prisma/
 
 # 安装依赖
 RUN npm ci --only=production && npm cache clean --force
@@ -49,49 +49,3 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3001/api/health || exit 1
 
 CMD ["npm", "run", "start:prod"]
-
----
-
-# frontend/Dockerfile
-FROM node:18-alpine AS dependencies
-
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-
-FROM node:18-alpine AS builder
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci
-
-COPY . .
-
-ARG NEXT_PUBLIC_BACKEND_URL
-ENV NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
-
-RUN npm run build
-
-FROM node:18-alpine AS runner
-
-WORKDIR /app
-
-# 创建非 root 用户
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-
-COPY --from=builder /app/next.config.js ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-
-RUN chown -R nextjs:nodejs /app
-USER nextjs
-
-EXPOSE 3000
-
-ENV NODE_ENV=production
-ENV PORT=3000
-
-CMD ["node", "server.js"]
