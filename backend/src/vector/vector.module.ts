@@ -1,0 +1,20 @@
+// backend/src/vector/vector.module.ts
+import { Module } from '@nestjs/common';
+import { VectorService } from './vector.service';
+
+@Module({
+  providers: [VectorService],
+  exports: [VectorService],
+})
+export class VectorModule {}
+ backend/src/vector/vector.service.tsimport{Injectable，Logger}from'@nestjs/common';import{ConfigService}from'@nestjs/config';import{ChromaClient}from'chromadb';从 'openai' 导入OpenAI;导出接口DocumentChunk{ id：string; 内容：字符串; chunkIndex：数字; documentId：字符串; 相似性？：数字;}@Injectable（）exportclassVectorService{privatereadonly logger =newLogger（VectorService.名称）;私有 OpenAI：OpenAI;私有色度：ChromaClient;私人收藏：任意;constructor（private configService：ConfigService）{this。openai=newOpenAI（{ apiKey：this.configService 的 configService 中。get<string>（'OPENAI_API_KEY'），}）;这个。chroma=newChromaClient（{ path：this.configService 的 configService 中。get<string>（'CHROMA_URL'）||'http://localhost:8000'，}）;这个。初始化集合（）;}privateasyncinitializeCollection（）{try{this.collection=await 这个。色度。getOrCreateCollection（{ name：'documents'， metadata：{'hnsw：space'：'cosine'}}）;这个。记录器。log（' ✅ ChromaDB 集合初始化'）;}catch（错误）{这个。记录器。error（' ❌ 无法初始化 ChromaDB 集合：'， error）;}}/**
+ * 将文本转换为向量
+ */asynccreateEmbedding（text：string）：Promise<number[]>{try{const response =awaitthis.开放人工智能。嵌入。create（{ model：'text-embedding-3-small'， input： text，}）;返回响应。data[0]。嵌入;}catch（错误）{这个。记录器。error（'无法创建嵌入：'， error）;thrownewError（'无法创建文本嵌入'）;}}/**
+ * 将文档分块
+ */chunkText（text：string， chunkSize =1000， overlap =200）：string[]{const chunks：string[]=[];让开始 =0;while（开始<文本。length）{const end =数学。min（start + chunkSize， text.长度）;const chunk = 文本。slice（开始，结束）; 尝试在句号、感叹号或问号处分割if（end < text.length）{const lastSentenceEnd =数学。max（ 块。lastIndexOf（'.'），块。lastIndexOf（'！'），块。lastIndexOf（'？'），块。lastIndexOf（'。'）））;if（lastSentenceEnd>块。length*0.5）{ 块。push（块。slice（0， lastSentenceEnd +1））; 开始 += lastSentenceEnd +1;}else{ 块。push（块）; start += chunkSize - 重叠;}}else{ 块。push（块）;休息;}}返回块。filter（chunk => 块。trim（） 的 Trim（） 中。长度>0）;}/**
+ * 存储文档块到向量数据库
+ */asyncstoreDocumentChunks（ documentId：string， chunks：string[]）：Promise<void>{try{const嵌入：number[][]=[];常量 ids：string[]=[];常量元数据：any[]=[];常量文档：string[]=[];for（让 i =0; 我<块。长度; i++）{const chunkId ='${documentId}_chunk_${i}';const embedding =awaitthis。createEmbedding（块[i]）; 嵌入。push（嵌入）; ids。push（块Id）; 元数据。push（{ documentId， chunkIndex： i， length： chunks[i].长度，}）; 文件。push（chunks[i]）;}等待这个。收藏。add（{ ids， embeddings， metadatas， documents，}）;这个。记录器。log（' ✅ 存储 ${chunks.length} 块，用于文档 ${documentId}'）;}catch（错误）{这个。记录器。error（'无法存储文档块：'， error）;thrownewError（'无法将文档存储在矢量数据库中'）;}}/**
+ * 搜索相似文档块
+ */asyncsearchSimilarChunks（ query：string， topK =5）：Promise<DocumentChunk[]>{try{constqueryEmbedding =await这个。createEmbedding（查询）;const results =await这个。收藏。query（{ queryEmbeddings：[queryEmbedding]， nResults： topK， include：['documents'，'metadatas'，'distances']，}）;如果（！结果。文件||！结果。documents[0]）{return[];}const 块：DocumentChunk[]=[];const 文档 = 结果。文件[0];const 元数据 = 结果。元数据[0];const distances = results。距离[0];for（让 i =0; 我<文件。长度; i++）{常量元数据 = 元数据[i]; 块。push（{ id：'${元数据。documentId}_chunk_${元数据。chunkIndex}'，内容：documents[i]，chunkIndex：元数据。chunkIndex，documentId：元数据。documentId， similarity：1- distances[i]， 将距离转换为相似度}）;}返回块;}catch（错误）{这个。记录器。error（'无法搜索类似的块：'， error）;thrownewError（'无法在矢量数据库中搜索'）;}}/**
+ * 删除文档的所有块
+ */asyncdeleteDocumentChunks（documentId：string）：Promise<void>{try{ ChromaDB 不支持直接按 metadata 删除，需要先查询再删除const results =await这个。收藏。get（{ where：{ documentId }，}）;if（结果。ids&结果。ids。length>0）{等待这个。收藏。delete（{ ids： results.ids，}）;这个。记录器。log（' ✅ 删除文档的块 ${documentId}'）;}}catch（错误）{this.记录器。error（'无法删除文档块：'， error）;thrownewError（'无法从矢量数据库中删除文档'）;}}} backend/src/vector/vector.module.tsimport{Module}from'@nestjs/common';import{VectorService}from'./vector.service';@Module（{ providers：[VectorService]， exports：[VectorService]，}）exportclassVectorModule{}
